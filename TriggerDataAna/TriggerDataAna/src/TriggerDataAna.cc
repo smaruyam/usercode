@@ -493,7 +493,7 @@ if ( (NHF<0.99 && NEMF<0.99 && NumConst>1 && MUF<0.8) && ( ( eta <= 2.4 && CHF>0
   if( mets->size() > 0){
      const auto pmet = mets->ptrAt(0);
      met     = pmet -> pt();
-     metRaw  = pmet -> uncorrectedPt();
+//     metRaw  = pmet -> uncorrectedPt();
      metCalo = pmet -> caloMETPt();
   }
 
