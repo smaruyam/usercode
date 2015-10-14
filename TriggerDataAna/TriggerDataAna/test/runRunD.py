@@ -6,9 +6,9 @@ process.load("FWCore.MessageService.MessageLogger_cfi")
 process.load("Configuration.Geometry.GeometryIdeal_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
-process.GlobalTag.globaltag = '74X_dataRun2_Prompt_v2'
+process.GlobalTag.globaltag = '74X_dataRun2_Prompt_v4' # for runD
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(2 ) )
 inputFilesAOD = cms.untracked.vstring(
     '/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/AODSIM/PU20bx25_PHYS14_25_V1-v1/00000/00CC714A-F86B-E411-B99A-0025904B5FB8.root',
     '/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/AODSIM/PU20bx25_PHYS14_25_V1-v1/00000/040D9AF7-FB6B-E411-8106-0025907DBA06.root',
@@ -50,7 +50,24 @@ my_id_modules = ['RecoEgamma.ElectronIdentification.Identification.cutBasedElect
 for idmod in my_id_modules:
     setupAllVIDIdsInModule(process,idmod,setupVIDElectronSelection)
 
-process.ntupler = cms.EDAnalyzer('TriggerAna',
+
+#from PhysicsTools.PatAlgos.producersLayer1.jetUpdater_cff import patJetCorrFactorsUpdated
+process.load("PhysicsTools.PatAlgos.producersLayer1.jetUpdater_cff")
+process.patJetCorrFactorsReapplyJEC = process.patJetCorrFactorsUpdated.clone(
+  src = cms.InputTag("slimmedJets"),
+  levels = ['L1FastJet', 
+        'L2Relative', 
+        'L3Absolute',
+	'L2L3Residual'],
+  payload = 'AK4PFchs' ) # Make sure to choose the appropriate levels and payload here!
+
+from PhysicsTools.PatAlgos.producersLayer1.jetUpdater_cff import patJetsUpdated
+process.patJetsReapplyJEC = process.patJetsUpdated.clone(
+  jetSource = cms.InputTag("slimmedJets"),
+  jetCorrFactorsSource = cms.VInputTag(cms.InputTag("patJetCorrFactorsReapplyJEC"))
+  )
+
+process.ntupler = cms.EDAnalyzer('TriggerDataAna',
 				triggerResults = cms.InputTag( 'TriggerResults', '', 'HLT' ),
     prescales = cms.InputTag("patTrigger"),
     objects = cms.InputTag("selectedPatTrigger"),
@@ -64,7 +81,8 @@ process.ntupler = cms.EDAnalyzer('TriggerAna',
                                  conversions  = cms.InputTag('allConversions'),
                                  electronsMiniAOD    = cms.InputTag("slimmedElectrons"),
                                  muonsMiniAOD    = cms.InputTag("slimmedMuons"),
-                                 jetsMiniAOD    = cms.InputTag("slimmedJets"),
+                                 jetsMiniAOD    = cms.InputTag("patJetsReapplyJEC"),
+#                                 jetsMiniAOD    = cms.InputTag("slimmedJets"),
                                  metsMiniAOD    = cms.InputTag("slimmedMETs"),
                                  genParticlesMiniAOD = cms.InputTag("prunedGenParticles"),
                                  verticesMiniAOD     = cms.InputTag("offlineSlimmedPrimaryVertices"),
@@ -75,4 +93,5 @@ process.ntupler = cms.EDAnalyzer('TriggerAna',
 process.TFileService = cms.Service("TFileService",
                                    fileName = cms.string( outputFile )
                                    )
-process.p = cms.Path(process.egmGsfElectronIDSequence * process.ntupler)
+process.p = cms.Path(process.patJetCorrFactorsReapplyJEC + process. patJetsReapplyJEC + process.egmGsfElectronIDSequence * process.ntupler)
+#process.p += cms.Sequence( process.patJetCorrFactorsReapplyJEC + process. patJetsReapplyJEC )
