@@ -71,7 +71,9 @@ class TriggerDataAna : public edm::EDAnalyzer {
 	edm::EDGetTokenT<edm::TriggerResults>  triggerResultsTag_;
       edm::EDGetTokenT<pat::TriggerObjectStandAloneCollection> triggerObjects_;
       edm::EDGetTokenT<pat::PackedTriggerPrescales> triggerPrescales_;
-	std::string strig ;
+//	std::string strig ;
+        std::vector<std::string> vstrig ;
+	        
       edm::EDGetTokenT<reco::BeamSpot> beamSpotToken_;
 
       edm::EDGetToken electronsToken_;
@@ -138,7 +140,8 @@ TriggerDataAna::TriggerDataAna(const edm::ParameterSet& iConfig):
   triggerResultsTag_(consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("triggerResults"))),
     triggerObjects_(consumes<pat::TriggerObjectStandAloneCollection>(iConfig.getParameter<edm::InputTag>("objects"))),
     triggerPrescales_(consumes<pat::PackedTriggerPrescales>(iConfig.getParameter<edm::InputTag>("prescales"))),
-  strig(iConfig.getUntrackedParameter<std::string>("triggerName", "none" )),
+//  strig(iConfig.getUntrackedParameter<std::string>("triggerName", "none" )),
+  vstrig(iConfig.getUntrackedParameter<std::vector<std::string> >("triggerNames" )),
   eleLooseIdMapToken_(consumes<edm::ValueMap<bool> >(iConfig.getParameter<edm::InputTag>("eleLooseIdMap")))
 {
   // Prepare tokens for all input collections and objects
@@ -268,10 +271,13 @@ TriggerDataAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   if(triggerResultsHandle_.isValid() == true ){
         for(unsigned int u = 0; u < names.size(); u++){
-		if ( names.triggerName(u).find(strig) != std::string::npos) {
-			if(triggerResultsHandle_ -> wasrun(u) ){
-				if(triggerResultsHandle_ -> accept(u)){ 
-					trig = 1;
+                for(unsigned int v = 0; v < vstrig.size(); v++){
+                        if ( names.triggerName(u).find(vstrig.at(v) ) != std::string::npos) {
+//		if ( names.triggerName(u).find(strig) != std::string::npos) {
+				if(triggerResultsHandle_ -> wasrun(u) ){
+					if(triggerResultsHandle_ -> accept(u)){ 
+						trig = 1;
+					}
 				}
 			}
 		}
