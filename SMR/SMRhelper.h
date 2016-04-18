@@ -40,8 +40,8 @@ class SMR {
 		void setCalibrationElectronAndMuon(unsigned int index, float newCalibration){ if(index < indexElectronAndMuon) calibrationElectronAndMuon[index] = newCalibration;}
 		void setAlgorithm(int algo){ algorithm = algo;}
 		float getMass(){return smr;}
-		float getNdaughter1(){return fdc1;}
-		float getNdaughter2(){return fdc2;}
+		int getNdaughter1(){return fdc1;}
+		int getNdaughter2(){return fdc2;}
 };
 
 SMR::SMR() : smr(-1), fdc1(-1), fdc2(-1), indexTau(10), indexElectronAndMuon(2), calibrationTau {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0}, calibrationElectronAndMuon {1.0, 1.0} {
@@ -92,7 +92,7 @@ void SMR::estimateMass(pat::Tau tau1, pat::Tau tau2){
 	}
 	else if(algorithm == 2){ // not necessarily back-to-back in phi plane. Here we cannot combine daughters.
 		float mvis = ( tau1 . p4() + tau2 . p4() ). mass();
-		mvis *= sqrt( (fdc1 + 1) * (fdc2 + 1) );			
+		mvis *= sqrt( ((float) fdc1 + 1)/fdc1 * ((float) fdc2 + 1)/fdc2 );			
 		if(calibration == true){
 			mvis *= sqrt( calibrationTau[fdc1 - 1] );
 			mvis *= sqrt( calibrationTau[fdc2 - 1] );
@@ -134,7 +134,7 @@ void SMR::estimateMass(pat::Tau tau1, pat::Muon muon){
 	}
 	else if(algorithm == 2){ // not necessarily back-to-back in phi plane
 		float mvis = ( tau1 . p4() + muon . p4() ). mass();
-		mvis *= sqrt( (fdc1 + 1) * (fdc2 + 2) );			
+		mvis *= sqrt( ((float) fdc1 + 1)/fdc1 * ((float) fdc2 + 2)/fdc2 );			
 		if(calibration == true){
 			mvis *= sqrt( calibrationTau[fdc1 - 1] );
 			mvis *= sqrt( calibrationElectronAndMuon[1] );
@@ -176,7 +176,7 @@ void SMR::estimateMass(pat::Tau tau1, pat::Electron elec){
 	}
 	else if(algorithm == 2){ // not necessarily back-to-back in phi plane
 		float mvis = ( tau1 . p4() + elec . p4() ). mass();
-		mvis *= sqrt( (fdc1 + 1) * (fdc2 + 2) );			
+		mvis *= sqrt( ((float) fdc1 + 1)/fdc1 * ((float) fdc2 + 2)/fdc2 );			
 		if(calibration == true){
 			mvis *= sqrt( calibrationTau[fdc1 - 1] );
 			mvis *= sqrt( calibrationElectronAndMuon[0] );
@@ -215,7 +215,7 @@ void SMR::estimateMass(pat::Electron elec1, pat::Electron elec2){
 	}
 	else if(algorithm == 2){ // not necessarily back-to-back in phi plane
 		float mvis = ( elec1 . p4() + elec2 . p4() ). mass();
-		mvis *= sqrt( (fdc1 + 2) * (fdc2 + 2) );			
+		mvis *= sqrt( ((float) fdc1 + 2)/fdc1 * ((float) fdc2 + 2)/fdc2 );			
 		if(calibration == true){
 			mvis *= calibrationElectronAndMuon[0] ;
 		}
@@ -253,7 +253,7 @@ void SMR::estimateMass(pat::Muon muon1, pat::Muon muon2){
 	}
 	else if(algorithm == 2){ // not necessarily back-to-back in phi plane
 		float mvis = ( muon1 . p4() + muon2 . p4() ). mass();
-		mvis *= sqrt( (fdc1 + 2) * (fdc2 + 2) );			
+		mvis *= sqrt( ((float) fdc1 + 2)/fdc1 * ((float) fdc2 + 2)/fdc2 );			
 		if(calibration == true){
 			mvis *= calibrationElectronAndMuon[1] ;
 		}
@@ -291,7 +291,7 @@ void SMR::estimateMass(pat::Electron elec, pat::Muon muon){
 	}
 	else if(algorithm == 2){ // not necessarily back-to-back in phi plane
 		float mvis = ( elec . p4() + muon . p4() ). mass();
-		mvis *= sqrt( (fdc1 + 2) * (fdc2 + 2) );			
+		mvis *= sqrt( ((float) fdc1 + 2)/fdc1 * ((float) fdc2 + 2)/fdc2 );			
 		if(calibration == true){
 			mvis *= sqrt( calibrationElectronAndMuon[0] );
 			mvis *= sqrt( calibrationElectronAndMuon[1] );
