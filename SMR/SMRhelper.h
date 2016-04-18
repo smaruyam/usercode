@@ -26,8 +26,8 @@ class SMR {
 	int algorithm;
 	float dPhiCut;
 	public:
-		SMR();// : indexTau(10), indexElectronAndMuon(2), calibrationTau {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0}, calibrationElectronAndMuon {1.0, 1.0} {};
-		SMR(bool flag, int algo, float dphi);// : indexTau(10), indexElectronAndMuon(2), calibrationTau {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0}, calibrationElectronAndMuon {1.0, 1.0} {};
+		SMR();
+		SMR(bool flag, int algo, float dphi);
 		void estimateMass(pat::Tau, pat::Tau);
 		void estimateMass(pat::Tau, pat::Electron);
 		void estimateMass(pat::Tau, pat::Muon);
